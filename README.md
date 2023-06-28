@@ -34,7 +34,7 @@ If you look closely, this command may give the error: `caution: not extracting; 
 
 ### 'File types in source directory'
 This scans the source directory for all of the file types that can be moved then asks which one to do first. If you opted earlier to not delete the zip files, they will appear here and you can decide whether to keep them or not.
-#### Important Note: Only enter one file type at a time. This script wasn't made to do more than one at a time. I could probably figure out how to do that, but I am okay not spending more time on this and getting to other projects. 
+#### Important Note: Only enter one file type at a time and do NOT include the `.`. This script wasn't made to do more than one at a time. I could probably figure out how to do that, but I am okay not spending more time on this and getting to other projects. 
 
 ### 'Final Question before running: Run the mv command with which mode?'
 This last question asks how to move files over. Once you choose an option, it will run to completion unless you give the `kill` command: `ctrl+c`.
