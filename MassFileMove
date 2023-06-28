@@ -1,5 +1,5 @@
 #!/bin/bash
-#set -x
+#set -x # used in debugging
 # Move a file from all subfolders
 # to a target folder.
 # Use $1 as the parent folder to move from
@@ -11,8 +11,6 @@ log="folderColapseLog_$(date '+%d%B%y|%I:%M')"
 
 
 # User defined Variables
-#function colapse
-#{
 cd
 echo "Warning!! Do Not Put Target Directory Inside Source Directory"
 echo -n "It will be deleted!! Press Enter to continue"
@@ -30,7 +28,6 @@ echo -n "What is the source directory? "
 read source
 cd "$source"
 echo -n "Where do you want the files? "
-#echo -n "(Need to write how to get there from the source directory) "
 read dest
 log=$dest/$log
 if [ $unzip == 'n' ] || [ $unzip == 'no' ]; then
@@ -51,7 +48,6 @@ function colapse
 echo "File types in '$source':"
 find "../$source" -type f -name *.* | sed 's|.*\.||' | sort -u
 echo -n "What file types are we looking for? "
-#echo -n "(One file type at a time, don't include the '.') "
 read fileTypes
 echo "Alright, one more question:"
 echo "Enter the mode you want to run this in:"
