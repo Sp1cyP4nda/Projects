@@ -1,0 +1,98 @@
+#!/bin/bash
+#set -x
+# Move a file from all subfolders
+# to a target folder.
+# Use $1 as the parent folder to move from
+# Use $2 as the target folder to move to
+# Also, unzip everything too
+
+# Hard defined variables
+log="folderColapseLog_$(date '+%d%B%y|%I:%M')"
+
+
+# User defined Variables
+#function colapse
+#{
+cd
+echo "Warning!! Do Not Put Target Directory Inside Source Directory"
+echo -n "It will be deleted!! Press Enter to continue"
+read
+echo "Did you remember to back everything up first?"
+echo -n "Press ctrl+c at any point to cancel"
+read
+echo -n "I'm serious, Devon. Back up your shit."
+read
+echo "Okay, here goes nothing"
+echo "First, a couple questions:"
+echo -n "Is everything unzipped? (Y/n) "
+read unzip
+echo -n "What is the source directory? "
+read source
+cd "$source"
+echo -n "Where do you want the files? "
+#echo -n "(Need to write how to get there from the source directory) "
+read dest
+log=$dest/$log
+if [ $unzip == 'n' ] || [ $unzip == 'no' ]; then
+	echo >> $log.log;echo "Unzipping files" >> $log.log
+	unzip -lj $(find -iname "*".zip) -d $dest |& tee -a $log.log
+	unzip -j $(find -iname "*".zip) -d $dest |& tee -a $log.log
+	echo -n "Do you want to remove all zip files? (y/N)"
+	read remove
+	if [ $remove == 'y' ] || [ $remove == 'yes' ];then
+		echo >> $log.log;echo "Removing zip files" >> $log.log
+		rm -v $(find -iname "*.zip") |& tee -a $log.log
+		echo "Done. Starting program"
+#		exit
+	fi
+fi
+function colapse
+{
+echo "File types in '$source':"
+find "../$source" -type f -name *.* | sed 's|.*\.||' | sort -u
+echo -n "What file types are we looking for? "
+#echo -n "(One file type at a time, don't include the '.') "
+read fileTypes
+echo "Alright, one more question:"
+echo "Enter the mode you want to run this in:"
+echo "	-i prompt before each instance of overwrite. You will be asked each time for a new name."
+echo "	-f overwrite each instance automatically without prompting"
+echo "	-n do not overwrite existing files"
+echo -n "Mode: "
+read mode
+sleep 0.5
+findFiles=$(find -iname '*'.$fileTypes)
+if [ $mode == '-i' ] || [ $mode == '-f' ];then
+	echo >> $log.log; echo "Moving Files with $mode mode" >> $log.log
+	mv -v $mode $findFiles "$dest" |& tee -a $log.log
+elif [ $mode == '-n' ];then
+	echo >> $log.log;echo "Moving Files with $mode mode" >> $log.log
+	mv -v $mode $findFiles "$dest" |& tee -a $log.log
+	rm -v $findFiles |& tee -a $log.log
+fi
+}
+function restart
+{
+echo -n "Done, shall I restart? (Y/n) "
+read restart
+if [ $restart == 'n' ] || [ $restart == 'no' ];then
+	echo -n "Want me to remove $source in it's entirety? (y/N) "
+	read remove
+	if [ $remove == 'y' ] || [ $remove == 'yes' ];then
+		echo >> $log.log;echo "Removing $source folder" >> $log.log
+		cd ..
+		rm -rf "$source"
+		exit
+	else
+		exit
+	fi
+else
+	echo >> $log.log;echo "Restarting Program" >> $log.log
+	colapse
+	restart
+fi
+}
+colapse
+restart
+# This is the magic command:
+# mv $(find -iname *.txt) ~/Target/
