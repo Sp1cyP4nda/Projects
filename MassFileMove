@@ -7,7 +7,7 @@
 # Also, unzip everything too
 
 # Hard defined variables
-log="folderColapseLog_$(date '+%d%B%y|%I:%M')"
+log="folderColapseLog_$(date '+%d%B%y|%I:%M')" # Creates the name for the log file
 
 
 # User defined Variables
@@ -29,7 +29,9 @@ read source
 cd "$source"
 echo -n "Where do you want the files? "
 read dest
-log=$dest/$log
+log=$dest/$log # tells the script where to put the log file
+
+# scans and unzips files in the src dir
 if [ $unzip == 'n' ] || [ $unzip == 'no' ]; then
 	echo >> $log.log;echo "Unzipping files" >> $log.log
 	unzip -lj $(find -iname "*".zip) -d $dest |& tee -a $log.log
@@ -40,9 +42,10 @@ if [ $unzip == 'n' ] || [ $unzip == 'no' ]; then
 		echo >> $log.log;echo "Removing zip files" >> $log.log
 		rm -v $(find -iname "*.zip") |& tee -a $log.log
 		echo "Done. Starting program"
-#		exit
 	fi
 fi
+
+# defines where to start the script when it restarts
 function colapse
 {
 echo "File types in '$source':"
@@ -67,6 +70,8 @@ elif [ $mode == '-n' ];then
 	rm -v $findFiles |& tee -a $log.log
 fi
 }
+
+# Prompts to restart the script
 function restart
 {
 echo -n "Done, shall I restart? (Y/n) "
@@ -88,6 +93,8 @@ else
 	restart
 fi
 }
+
+# This part kickstarts the whole thing
 colapse
 restart
 # This is the magic command:
