@@ -1,17 +1,14 @@
 #!/bin/bash
 #set -x # used in debugging
-# Move a file from all subfolders
-# to a target folder.
-# Use $1 as the parent folder to move from
-# Use $2 as the target folder to move to
-# Also, unzip everything too
+# Move a file from all subdirectories
+# to a target directory.
 
-# Hard defined variables
-log="folderColapseLog_$(date '+%d%B%y|%I:%M')" # Creates the name for the log file
-
+# Creates the name for the log file
+log="folderColapseLog_$(date '+%d%B%y|%I:%M')"
 
 # User defined Variables
 cd
+echo "Run this script as sudo"
 echo "Warning!! Do Not Put Target Directory Inside Source Directory"
 echo -n "It will be deleted!! Press Enter to continue"
 read
@@ -27,32 +24,24 @@ read unzip
 echo -n "What is the source directory? "
 read source
 cd "$source"
-echo -n "Where do you want the files? "
+echo -n "Where do you want the files?  "
 read dest
-log=$dest/$log # tells the script where to put the log file
+log="$dest"/"$log" # tells the script where to put the log file
 
 # scans and unzips files in the src dir
 if [ $unzip == 'n' ] || [ $unzip == 'no' ]; then
-	echo >> $log.log;echo "Unzipping files" >> $log.log
-	unzip -lj $(find -iname "*".zip) -d $dest |& tee -a $log.log
-	unzip -j $(find -iname "*".zip) -d $dest |& tee -a $log.log
-	echo -n "Do you want to remove all zip files? (y/N)"
-	read remove
-	if [ $remove == 'y' ] || [ $remove == 'yes' ];then
-		echo >> $log.log;echo "Removing zip files" >> $log.log
-		rm -v $(find -iname "*.zip") |& tee -a $log.log
-		echo "Done. Starting program"
-	fi
+	echo >> "$log".log;echo "Unzipping files" >> "$log".log
+	find . -name '*.zip' -exec sh -c 'unzip -d "`dirname \"{}\"`" "{}"' ';' |& tee -a "$log".log
 fi
+echo "Alright, last two questions:"
+echo "File types in '$source':"
+find "$source" -type f -name "*"."*" | sed 's|.*\.||' | sort -u
 
 # defines where to start the script when it restarts
 function colapse
 {
-echo "File types in '$source':"
-find "../$source" -type f -name *.* | sed 's|.*\.||' | sort -u
-echo -n "What file types are we looking for? "
+echo -n "What file types are we looking to move? "
 read fileTypes
-echo "Alright, one more question:"
 echo "Enter the mode you want to run this in:"
 echo "	-i prompt before each instance of overwrite. You will be asked each time for a new name."
 echo "	-f overwrite each instance automatically without prompting"
@@ -60,27 +49,22 @@ echo "	-n do not overwrite existing files"
 echo -n "Mode: "
 read mode
 sleep 0.5
-findFiles=$(find -iname '*'.$fileTypes)
-if [ $mode == '-i' ] || [ $mode == '-f' ];then
-	echo >> $log.log; echo "Moving Files with $mode mode" >> $log.log
-	mv -v $mode $findFiles "$dest" |& tee -a $log.log
-elif [ $mode == '-n' ];then
-	echo >> $log.log;echo "Moving Files with $mode mode" >> $log.log
-	mv -v $mode $findFiles "$dest" |& tee -a $log.log
-	rm -v $findFiles |& tee -a $log.log
-fi
+echo >> "$log".log; echo "Moving Files with $mode mode" >> "$log".log
+find -iname "*.$fileTypes" -exec mv -v $mode '{}' "$dest" \; |& tee -a "$log".log
 }
 
 # Prompts to restart the script
 function restart
 {
+echo "File types still in '$source':"
+find "$source" -type f -name "*"."*" | sed 's|.*\.||' | sort -u
 echo -n "Done, shall I restart? (Y/n) "
 read restart
 if [ $restart == 'n' ] || [ $restart == 'no' ];then
 	echo -n "Want me to remove $source in it's entirety? (y/N) "
 	read remove
 	if [ $remove == 'y' ] || [ $remove == 'yes' ];then
-		echo >> $log.log;echo "Removing $source folder" >> $log.log
+		echo >> "$log".log;echo "Removing $source folder" >> "$log".log
 		cd ..
 		rm -rf "$source"
 		exit
@@ -88,7 +72,7 @@ if [ $restart == 'n' ] || [ $restart == 'no' ];then
 		exit
 	fi
 else
-	echo >> $log.log;echo "Restarting Program" >> $log.log
+	echo >> "$log".log;echo "Restarting Program" >> "$log".log
 	colapse
 	restart
 fi
@@ -97,5 +81,3 @@ fi
 # This part kickstarts the whole thing
 colapse
 restart
-# This is the magic command:
-# mv $(find -iname *.txt) ~/Target/
