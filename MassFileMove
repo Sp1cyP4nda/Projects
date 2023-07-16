@@ -30,8 +30,9 @@ log="$dest"/"$log" # tells the script where to put the log file
 
 # scans and unzips files in the src dir
 if [ $unzip == 'n' ] || [ $unzip == 'no' ]; then
-	echo >> "$log".log;echo "Unzipping files" >> "$log".log
-	find . -name '*.zip' -exec sh -c 'unzip -d "`dirname \"{}\"`" "{}"' ';' |& tee -a "$log".log
+	echo >> "$log".log;echo "Deleting files as they are unzipped." >> "$log".log
+	find . -depth -name '*.zip' -exec /usr/bin/unzip -n {} \; -delete |& tee -a "$log".log
+	echo "Done. Starting program"
 fi
 echo "Alright, last two questions:"
 echo "File types in '$source':"
