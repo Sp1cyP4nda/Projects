@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# update & upgrade
+cp /etc/apt/sources.list.d/parrot.list /etc/apt/sources.list.d/parrot.list.bak # 1of5 this creates a backup of the original source.list. Uncomment this during repo outages
+cp "$(dirname "$0")"/parrot.list /etc/apt/sources.list.d/parrot.list # 2of5 this replaces the source.list with a source.list that will work during the outage
+mv /etc/apt/source.list /etc/apt/source.list.bak # 3of5 temporarily gets apt's source.list out of the way
+apt update -y && apt full-upgrade -y && apt autoremove -y && apt autoclean -y
+
+# Anything I forgot to install, put here, then comment out
+apt install rclone
+
+# another cleanup
+mv /etc/apt/sources.list.d/parrot.list.bak /etc/apt/sources.list.d/parrot.list #4of5 this puts everything back to the way it's supposed to be.
+#mv /etc/apt/sources.list.bak /etc/apt/sources.list #5of5 puts back apt's sources.list
+apt update -y && apt upgrade -y && apt autoremove -y && apt autoclean -y

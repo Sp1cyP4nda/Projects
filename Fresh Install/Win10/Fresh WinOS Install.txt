@@ -1,0 +1,21 @@
+https://www.windowscentral.com/how-reduce-windows-10-footprint-your-pc
+
+Open command prompt as admin and type in each commmand one at a time
+slmgr /ipk TX9XD-98N7V-6WMQ6-BX7FG-H8Q99
+slmgr /skms kms8.msguides.com
+slmgr /ato
+Compact.exe /CompactOS:query /*if it says is isn't compact, use the following command*/
+Compact.exe /CompactOS:always
+powercfg /h /type reduced /*reduces the hiberfil.sys file by 30%*/
+powercfg /h /off /*removes the hiberfil.sys file entirely*/
+powercfg /h /size 100 /*changes the hibernation settings back to the full amount*/
+
+Settings:
+Dark Mode/Purple accents
+Time Zone = (-5:00 UTC) Eastern Time
+Taskbar settings
+
+Install:
+Google Drive
+Firefox
+https://allaboutcookies.org/firefox-privacy-settings

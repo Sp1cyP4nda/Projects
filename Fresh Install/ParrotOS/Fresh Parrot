@@ -1,0 +1,89 @@
+#! /bin/bash
+
+# Note: 7z2john was having an issue with Compress::Raw:Lzma
+# cd into /root and run the following command to fix:
+# sudo cpanm Compress::Raw::Lzma [--force if it doesn't work]
+# If --force still doesn't work, clone the repo
+# Important: don't use 'sudo cpanm' in /root/.cpanm.
+# 7z2john looks for Compress::Raw::Lzma in the /root/ directory
+
+# check for sudo privileges
+if [ "$EUID" != '0' ]; then
+    echo 'Please run this script with sudo privileges:'
+    echo 'sudo bash [path to this script]/Fresh\ Parrot'
+    exit
+fi
+echo
+
+# Copy wifi connections
+#cp -r "$(dirname "$0")"/system-connections/ /etc/NetworkManager/
+#chmod 600 /etc/NetworkManager/system-connections/*
+
+# backup bashrc adjustment
+cd ~/
+cp ~/.bashrc ~/.bashrc.bak
+# terminal adjustment
+echo 'export PS1="\[\e[91m\]┌──[\[\e[0;39m\]\D{%Y-%m-%d %a}\[\e[93m\]-\[\e[96m\]\t\[\e[91m\]]─[\[\e[0;39m\]\u\[\e[93m\]@\[\e[96m\]\h\[\e[91m\]]─[\[\e[33m\]\w\[\e[91m\]]\[\e[93m\]\n\[\e[91m\]└──╼[\[\e[0m\]~~~{\e[38;5;88m\]@\e[91m\]]\e[93m\]$\[\e[0m\] "' >> .bashrc
+# add startup script for trackpad
+cp "$(dirname "$0")"/startup.script /etc/systemd/system/
+# Modify touchpad immediately
+synclient FingerLow=5 FingerHigh=5 VertScrollDelta=10 HorizScrollDelta=50 VertTwoFingerScroll=0 HorizTwoFingerScroll=0 CircularScrolling=1
+
+# Setting up Brave
+curl -fsSLo /usr/share/keyrings/brave-browser-archive-keyring.gpg https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg
+echo "deb [signed-by=/usr/share/keyrings/brave-browser-archive-keyring.gpg] https://brave-browser-apt-release.s3.brave.com/ stable main"|sudo tee /etc/apt/sources.list.d/brave-browser-release.list
+
+# Adding repos
+#cp /etc/apt/sources.list /etc/apt/sources.list.bak
+#echo $(cat "$(dirname "$0")"/repos.list | sudo tee -a /etc/apt/sources.list
+
+# update & upgrade
+#cp /etc/apt/sources.list.d/parrot.list /etc/apt/sources.list.d/parrot.list.bak # 1of5 this creates a backup of the original source.list. Uncomment this during repo outages
+#cp "$(dirname "$0")"/parrot.list /etc/apt/sources.list.d/parrot.list # 2of5 this replaces the source.list with a source.list that will work during the outage
+#mv /etc/apt/source.list /etc/apt/source.list.bak # 3of5 temporarily gets apt's source.list out of the way
+apt --fix-broken install
+apt update -y && apt full-upgrade -y && apt autoremove -y && apt autoclean -y
+
+# installing tools
+apt install $(cat "$(dirname "$0")"/scripts/apt.tools | tr "\n" " ") -y
+echo
+mkdir ~/Tools/
+cd ~/Tools/
+while IFS= read -r repo; do
+  git clone $repo.git
+done < "$(dirname "$0")"/scripts/github.tools
+echo
+cd ~/Tools/impacket
+python setup.py install
+cd ~/Tools/kwprocessor
+make
+cd ~/Tools/hashcat-utils/src
+make
+cd ~/Tools/hashid
+sudo install -g 0 -o 0 -m 0644 doc/man/hashid.7 /usr/share/man/man7/
+sudo gzip /usr/share/man/man7/hashid.7
+cd ~/Tools/
+wget $(cat "$(dirname "$0")"/scripts/wget.tools | tr "\n" " ")
+echo
+7z x $(cat "$(dirname "$0")"/scripts/7z.tools | tr "\n" " ")
+cd ~/
+
+# Setting up Google Drive - since there needs to be a reboot before brave can be used, setting this up needs to happen Before I get rid of firefox
+mkdir gdrive
+rclone config
+
+# uninstalling tools I don't want
+apt purge $(cat "$(dirname "$0")"/scripts/uninstall.list | tr "\n" " ") -y
+echo
+
+# startup scripts
+#cp "$(dirname "$0")"/startup.sh ~/startup.sh
+#chmod +x ~/startup.sh
+
+# another cleanup
+#mv /etc/apt/sources.list.d/parrot.list.bak /etc/apt/sources.list.d/parrot.list #4of5 this puts everything back to the way it's supposed to be.
+#mv /etc/apt/sources.list.bak /etc/apt/sources.list #5of5 puts back apt's sources.list
+apt update -y && apt upgrade -y && apt autoremove -y && apt autoclean -y
+
+# Restart the system
+reboot
