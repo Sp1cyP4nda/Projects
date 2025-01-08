@@ -1,0 +1,17 @@
+This is a terraform script to quickly build and deploy a simple Minecraft Server on demand.
+** Please do your research regarding cost management **
+
+1. Download the files and update the minecraft server url and java version if needed
+2. Type `terraform init`
+3. Type `terraform plan`
+4. Make sure everything is agreeable
+5. Type `terraform apply`
+6. The script will ask you for two pieces of information:
+6a. Which IP address should be whitelisted. 
+This will be the IP address from which you administer the EC2 instance.
+6b. What instance type you''d like to use.
+Please do your research here. I am not responsible for cost management mistakes.
+This can easily become very expensive very quickly.
+7. The script will then display the server IP address and save a copy of the private key it generated.
+7a. Wait for about 5 minutes to let the server boot up, then enter this address and port 25565 into the server connect menu screen
+7b. Whenever you need to connect to the server, go to the generated EC2 instance in your AWS console and click on 'Connect' then 'SSH'. Copy the example command at the bottom and paste it into a shell. Please note: this has to be done from the whitelisted IP address assigned earlier
