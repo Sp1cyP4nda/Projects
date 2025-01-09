@@ -53,12 +53,26 @@ resource "aws_key_pair" "mc_key_pair" {
   public_key = tls_private_key.mc_priv_key.public_key_openssh
 }
 
+# Deploy and configure the Minecraft Server
 resource "aws_instance" "minecraft" {
   ami = data.aws_ami.amazon_linux.id
   instance_type = var.ec2_instance_type
   vpc_security_group_ids = [aws_security_group.mc_sec_grp.id]
   associate_public_ip_address = true
   key_name = aws_key_pair.mc_key_pair.key_name
+
+  # connection {
+  #   type = "ssh"
+  #   user = "ec2-user"
+  #   private_key = tls_private_key.mc_priv_key.private_key_pem
+  #   host = self.public_ip
+  #   timeout = "1m"
+  # }
+
+  # provisioner "file" {
+  #   source = "${path.module}/world.zip"
+  #   destination = "/tmp/world.zip"
+  # }
 
   # Keep this part updated as needed, most specifically the java dowload.
   user_data = <<-EOF
@@ -94,6 +108,9 @@ resource "aws_instance" "minecraft" {
     chmod +x stop
     sleep 1
     sudo sed -i 's/motd=A Minecraft Server/motd=On Your Upkeep/p' server.properties
+    # sudo rm -rf "world/"
+    # cd /tmp
+    # sudo unzip -d /opt/minecraft/server/ world.zip
 
     # Create SystemD Script to run Minecraft server jar on reboot
     cd /etc/systemd/system/
@@ -102,6 +119,8 @@ resource "aws_instance" "minecraft" {
     sudo systemctl daemon-reload
     sudo systemctl enable minecraft.service
     sudo systemctl start minecraft.service
+    # cd /opt/minecraft/server
+    # sudo ./start
     EOF
   tags = {
     Name = "Minecraft"
