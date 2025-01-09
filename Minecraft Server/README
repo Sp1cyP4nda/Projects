@@ -15,3 +15,5 @@ This can easily become very expensive very quickly.
 7. The script will then display the server IP address and save a copy of the private key it generated.
 7a. Wait for about 5 minutes to let the server boot up, then enter this address and port 25565 into the server connect menu screen
 7b. Whenever you need to connect to the server, go to the generated EC2 instance in your AWS console and click on 'Connect' then 'SSH'. Copy the example command at the bottom and paste it into a shell. Please note: this has to be done from the whitelisted IP address assigned earlier
+
+Uncomment the commands in `mc_main.tf` to upload an already generated world instead of generating a new world with each spin-up
