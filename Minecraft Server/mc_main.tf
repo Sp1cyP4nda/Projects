@@ -61,15 +61,17 @@ resource "aws_instance" "minecraft" {
   associate_public_ip_address = true
   key_name = aws_key_pair.mc_key_pair.key_name
 
-  # connection {
-  #   type = "ssh"
-  #   user = "ec2-user"
-  #   private_key = tls_private_key.mc_priv_key.private_key_pem
-  #   host = self.public_ip
-  #   timeout = "1m"
-  # }
+  connection {
+    type = "ssh"
+    user = "ec2-user"
+    private_key = tls_private_key.mc_priv_key.private_key_pem
+    host = self.public_ip
+    timeout = "1m"
+  }
 
+  ## Leave this commented out if you want to generate a new world
   # provisioner "file" {
+  #   when = create
   #   source = "${path.module}/world.zip"
   #   destination = "/tmp/world.zip"
   # }
@@ -79,16 +81,19 @@ resource "aws_instance" "minecraft" {
     #!/bin/bash
 
     # Download my favorites
-    sudo yum install -y tree wget
+    sudo yum install -y tree wget unzip zip
 
     # Download Java
     wget https://corretto.aws/downloads/latest/amazon-corretto-21-aarch64-linux-jdk.rpm
     sudo yum localinstall amazon-corretto-21-aarch64-linux-jdk.rpm -y
+    rm amazon-corretto-21-aarch64-linux-jdk.rpm
 
     # Install MC Java server in a directory we create
     adduser minecraft
     mkdir /opt/minecraft
     mkdir /opt/minecraft/server/
+    cd /tmp
+    sudo unzip -d /opt/minecraft/server/ world.zip
     cd /opt/minecraft/server
 
     # Download server jar file from Minecraft official website
@@ -107,7 +112,7 @@ resource "aws_instance" "minecraft" {
     printf '#!/bin/bash\nkill -9 $(ps -ef | pgrep -f "java")' >> stop
     chmod +x stop
     sleep 1
-    sudo sed -i 's/motd=A Minecraft Server/motd=On Your Upkeep/p' server.properties
+    sudo sed -i 's/motd=A Minecraft Server/motd=${var.server_name}/p' server.properties
     # sudo rm -rf "world/"
     # cd /tmp
     # sudo unzip -d /opt/minecraft/server/ world.zip
@@ -124,5 +129,36 @@ resource "aws_instance" "minecraft" {
     EOF
   tags = {
     Name = "Minecraft"
+  }
+}
+
+resource "null_resource" "on_destroy" {
+  triggers = {
+    aws_connect_ip = "${replace(aws_instance.minecraft.public_ip, ".", "-")}",
+    rsc_ip = "${aws_instance.minecraft.public_ip}"
+    key_location = "${aws_instance.minecraft.key_name}.pem"
+  }
+
+  connection {
+    type = "ssh"
+    user = "ec2-user"
+    private_key = file("${self.triggers.key_location}")
+    host = "${self.triggers.rsc_ip}"
+    timeout = "1m"
+  }
+
+  provisioner "remote-exec" {
+    when = destroy
+    inline = [ "cd /opt/minecraft/server/ && sudo zip -r /tmp/world.zip ./world" ]
+  }
+
+  provisioner "remote-exec" {
+    when = destroy
+    inline = [ "sudo chown -R minecraft:minecraft /tmp/world.zip" ]
+  }
+  
+  provisioner "local-exec" {
+    when = destroy
+    command = "scp -i ${self.triggers.key_location} ec2-user@ec2-${self.triggers.aws_connect_ip}.compute-1.amazonaws.com:/tmp/world.zip ./"
   }
 }
