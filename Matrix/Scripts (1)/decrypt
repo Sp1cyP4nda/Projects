@@ -1,0 +1,94 @@
+#!/bin/bash
+# This is my attempt at shortening ./decrypt.sh
+# incidently, this will also give me more control over it
+timing=$1
+digits=$2
+mode=$3
+coords=$4
+# This first function randomly generates a number with
+# as many digits as is inputed by the user
+function coordgen
+{
+count=1
+while [ $count -le $digits ];do
+	generator=$(($RANDOM%9))
+	((count++))
+	echo -n $generator
+done
+}
+echo -n $coords >> temp.txt
+
+# This function acts to create an array
+# using the coords we just created
+i=0
+while [ "$i" -lt ${#coords} ]; do
+	char[${i}]=${coords:${i}:1}
+	((i++))
+done
+# This first iteration scans each digit one at a time,
+# then locks a digit before moving onto the next one.
+function decrypt
+{
+tcount=0
+dcount=0
+while [ $tcount -le $timing ]; do
+	if [ $tcount -eq $timing ]; then
+		echo -n ${char[$dcount]}
+		tcount=0
+		((dcount++))
+		if [ $dcount -eq $digits ]; then
+			exit
+		fi
+	fi
+	echo -ne "$(($RANDOM%9))\b"
+	((tcount++))
+	sleep 0.075
+done
+}
+#decrypt
+# In human terms: write an amount of numbers equal
+# to $digits (scan), then erase and rewrite them $timing times.
+# When $tcount equals $timing write ${char[0]} and scan $digits-1.
+# Keep decreasing the scan until $dcount equals $digits,
+# aka $dcount-$digits=0
+function decryptall
+{
+tcount=0
+dcount=0
+while [ $tcount -le $timing ]; do
+	if [ $tcount -eq $timing ]; then
+		echo -n ${char[$dcount]}
+		tcount=0
+		((dcount++))
+		if [ $dcount -eq $digits ]; then
+#			sleep 1
+#			echo
+			exit
+		fi
+	fi
+	# Now that I have put this together so far, I just need to
+	# subtract out numbers as they are locked in
+	for i in $(seq 1 $(($digits-$dcount))); do
+		# Create a string $digits long
+		echo -n "$(($RANDOM%9))"
+		sleep 0.0000000000000001
+	done
+		# then erase the entire string and recreate a new one.
+	for i in $(seq 1 $(($digits-$dcount))); do
+		echo -ne "\b"
+	done
+	((tcount++))
+done
+echo
+}
+#decryptall
+if [ $mode == '' ]; then
+	echo "Please provide a mode switch: singular or simultaneous"
+	exit
+elif [ $mode == "simultaneous" ] || [ $mode == "sim" ] || [ $mode == "2" ]; then
+	decryptall
+elif [ $mode == "singular" ] || [ $mode == "sin" ] || [ $mode == "1" ]; then
+	decrypt
+else
+	echo "Choose singular or simultaneous"
+fi

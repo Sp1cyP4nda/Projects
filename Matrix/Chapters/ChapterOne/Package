@@ -1,0 +1,37 @@
+#!/bin/bash
+filename=$1
+timing=$2
+cd "$(dirname "$0")"
+business=$(sed -n 10p ./Saves/$filename.txt)
+cd ../../Scripts
+./writing "A package arrives at the front desk as you walk away from ordering." 0.05
+echo
+./writing "The cashier looks confused and says, \"Sorry, we don't have a $filename that works here.\"" 0.05
+echo
+./writing "The name catches your attention and you look over to see a white rabbit postage stamp on the package." 0.05
+echo
+./writing "Do you interupt the conversation? (y/n)" 0.05
+read decision
+if [ $decision == 'y' ] || [ $decision == 'yes' ];then
+	echo "Took the package" >> ../Saves/$filename.txt
+	./writing "You walk towards the two talking. \"Uhm...Hi...\" You say meekly, your confusion is obvious." 0.05
+	echo;./writing "\"I'm sorry to interupt, but uh, that's my name.\"" 0.05
+	echo;./writing "The courier blows a small bubble with her gum and it pops." 0.05
+	echo;./writing "She then looks to the cashier before looking you over and rolling her eyes." 0.05
+	echo;./writing "\"I don't get paid enough for this. Just sign here please.\" You oblige and she hands you the package." 0.05
+	echo;sed -i "1s/.*/ChapterOne\/Chase/" ../Saves/$filename.txt
+#	../Chapters/ChapterOne/Chase
+else # [ $decision == 'n' ] || [ $decision == 'no' ];then
+	echo "Waited for the package" >> ../Saves/$filename.txt
+	./writing "\"No? Is this $business?\"" 0.05
+	echo;./writing "\"It is.\"" 0.05
+	echo;./writing "\"Then maybe it's a new hire you haven't heard about yet.\" She shrugs, let's out a sigh and rolls her eyes." 0.05
+	echo;./writing "\"It isn't. I would know.\" The cashier is starting to become noticably irritated." 0.05
+	echo;./writing "The courier backs off, retorting with, \"Look, dude, whatever, my bosses just want" 0.05
+	echo;./writing "a signature. Just pass the package off onto whoever the next shift is.\"" 0.05
+	echo;./writing "\"Fine.\" The cashier relents and signs for the package. The courier walks away." 0.05
+	echo;./writing "Do you go receive the package? (y/n)" 0.05
+	read decision
+#	if [ $decision == 'y' ] || [ $decision == 'yes' ];then
+#	fi
+fi

@@ -1,0 +1,43 @@
+#!/bin/bash
+# This is the cafe scene that starts after the opening scene
+# The basic idea is that $filename is found here, and orders something
+# This is also where we get the character's blue pill name.
+# While waiting for the order, a package is delivered to the cafe
+# under the $filename's redpill name.
+# Eventually, I'd like there to be a decision as to whether the
+# character accepts the package, but for now the "no" option
+# will just be like "you get caught"
+cd "$(dirname "$0")"
+filename=$1
+timing=$2
+cafe=$(sed -n 10p ../../Saves/$filename.txt)
+cd ../../Scripts
+./writing "You walk into the old dingy cafe. The front counter is empty." $timing
+echo
+./writing "You look around and see the barista is sitting off to the side on their phone." $timing
+echo
+./writing "You clear your throat in an effort to get his attention." $timing
+echo
+sleep 1
+./writing "This kind of works and after a few more mintues he puts his phone in his pocket and rolls his eyes" $timing
+echo
+./writing "then approaches you. \"Yeah, what do you like?\" He asks with a sigh." $timing
+echo
+echo -n "Enter order: "
+read order
+sed -i "14s/.*/Cafe order\: $order/" ../Saves/$filename.txt
+./writing "\"People actually order that? Well, okay...\" He says judgementally and puts his marker to a cup." $timing
+echo
+./writing "\"Can I get a name? The boss wants me to get first and last on orders.\"" $timing
+echo
+echo -n "First Name: "
+read bluePillFirstName
+echo -n "Surname: "
+read bluePillSurName
+sed -i "15s/.*/Blue Pill Name\: $bluePillFirstName $bluePillSurName/" ../Saves/$filename.txt
+./writing "\"That's...an interesting name...\" he says snidely. \"Oh yeah. Boss wants me to start saying,\"" $timing
+echo
+./writing "he switches to a customer service voice with a strained smile, \"Welcome to $cafe\"" $timing
+echo
+sed -i "1s/.*/ChapterOne\/Package/" ../Saves/$filename.txt
+../Chapters/ChapterOne/Package $filename $cafe

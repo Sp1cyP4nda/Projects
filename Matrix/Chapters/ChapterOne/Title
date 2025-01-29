@@ -1,0 +1,8 @@
+#!/bin/bash
+cd "$(dirname "$0")"
+cd ../../Scripts
+#Title='The Matrix'
+#echo $Title
+./decalpha 10 10 1 "Welcome to"
+echo;./decalpha 10 10 2 "The Matrix";echo
+./decalpha 10 10 3 "The Matrix"

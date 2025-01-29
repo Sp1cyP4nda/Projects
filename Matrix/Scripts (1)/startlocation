@@ -1,0 +1,20 @@
+#!/bin/bash
+# This file is going to randomly choose a starting location
+# and output it to ./location3.sh
+
+timing=$1
+filename=$2
+
+start=$(($RANDOM%1)) # the number that goes here is the amount starting locations ( minus 1 )
+
+function decisions
+{
+if [ $start == 0 ]; then # this start outputs Salem, MA
+	./traceProgram $timing $filename 42314628257053239262 N W 'North America' 'United States of America' Massachusetts Salem "Coffee Time"
+elif [ $start == 1 ]; then
+	echo 'This conversation is being translated into English'
+#	echo '$filename not found'
+	exit
+fi
+}
+decisions
