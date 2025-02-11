@@ -1,1 +1,30 @@
-README Start
+This script assumes the following:
+> You have already downloaded and configured your AWS CLI
+> You have built and tested a local copy of your django website that is ready to deploy
+** Please do your own research regarding cost management **
+
+This package has 6 files to run this script:
+> 4 .tf files for managing the IaC
+> 1 python script responsible for packaging up the django framework to upload and deploy it
+> 1 Apache configuration file responsible for configuring the backend apache on the EC2 instance
+
+After downloading this package, configure the Apache file with your preferred configurations
+Then, go into the build_django.py script and change the "sources_to_archive" list names to how you named your django project directories
+Do not change the following names from the list:
+> db.sqlite3
+> manage.py
+> 000-default.conf
+Type in `terraform init` then `terraform plan` ** Always Plan First **
+Type in `terraform apply`, enter the required credentials and let the script do the rest
+
+Outputs:
+After deploying and configuring the website, the script will spit out .pem keys and an SSH command.
+The SSH command can be utilized to manually go in and make changes to the website as needed
+
+To note:
+> This script uses the free tier EC2 instance type for the most recent ubuntu x86_64 machine (t2.micro)
+> If you wish to make changes to the website, I'd recommend making those changes locally first
+-> This will update your db.sqlite3 file and you can use the SSH command to upload that file
+-> To accomplish this, change the SSH command to SCP and to the end of that command, add `:/tmp` (`...compute-1.amazonaws.com:/tmp`)
+--> the final command should look something like `scp -i "path/to/DJ-Keys.pem" "path/to/db.sqlite3" ubuntu@ec2-PUBLIC-IP-ADDRESS.compute-1.amazonaws.com:/tmp`
+--> Then ssh into the machine and replace the old db.sqlite3 file
