@@ -1,0 +1,5 @@
+In the chat, type `/mctg create <card_name>` replacing `<card_name>` with the card's name, separating the whitespaces with underscores.
+That will create all the backend files
+Then type `/reload`
+After that type `/function mctg:/cards` and it should come up with a bunch of cards that are inputted. Just choose whichever one you want while holding paper and it'll turn it into that cards.
+There's currently a bit of a hiccup with the resource pack because it has to be manually downloaded, but I'm working on automating that part.
