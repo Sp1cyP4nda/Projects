@@ -40,15 +40,20 @@ public class MCtG implements ModInitializer {
                     .executes(ctx -> {
                         ctx.getSource().sendFeedback(() ->
                             Text.literal("Usage:\n" +
-                                "\nReplace <card_name> with the name of the" +
-                                "name of the desired card. This doesn't have" +
-                                "to be exact.\n" +
-                                "\nThe material argument is optional." +
-                                "It defaults to paper when left blank\n" +
-                                "\nAll spaces in arguments should be separated\n" +
-                                "by underscores.\n\n" +
+                                "/mctg help displays this message\n\n" +
+                                "/mctg initialize \n" +
+                                "This command must be run as ops on first download and whenever you update this mod)\n\n" +
                                 "/mctg create <card_name> [material]\n" +
-                                "/mctg initialize (must be ops)"
+                                "> Replace <card_name> with the name of the name of the desired card. This doesn't have to be exact.\n" +
+                                "> The material argument is optional." +
+                                "-> It defaults to paper when left blank\n" +
+                                "> All spaces in arguments should be separated by underscores.\n" +
+                                "> After running /mctg create, reload your datapacks with /reload and your resource pack with F3 + T\n" +
+                                "-> Note: if this is being run on a server, you also need to redownload the server resource pack." +
+                                "> Then, type in /function mctg:cards/\n" +
+                                "-> This will show a list of all the cards that were created.\n" +
+                                "-> Choose the desired card (highlight + [TAB] + [ENTER]) while holding a piece of paper (or specified material)\n" +
+                                "--> Note: if this turns the texture into a large black and purple box, you have to reload your resource pack."
                             ),
                             false
                         );
