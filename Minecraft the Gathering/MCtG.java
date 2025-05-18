@@ -186,6 +186,7 @@ public class MCtG implements ModInitializer {
 
                                     // Replace the bundle's contents
                                     BundleContentsComponent bundle_shuffled = new BundleContentsComponent(items);
+                                    bundle.set(DataComponentTypes.HIDE_ADDITIONAL_TOOLTIP,Unit.INSTANCE);
                                     bundle.set(DataComponentTypes.BUNDLE_CONTENTS, bundle_shuffled);
 
                                     ctx.getSource().sendFeedback(() -> Text.literal("Bundle Shuffled!"), false);
