@@ -12,6 +12,16 @@ To create a card:
 2. Omit apostrophes and punctuations (commas, exclamation points, etc)
 3. Change spaces to underscores (dashes can either be used or changed to underscores as well)
 - wait for a few seconds until the paper changes
+- Double sided cards will give you the back as a separate card
+- Only the front can fit in the bundle
+-> I made this decision so the backside can't accidentally get shuffled into the deck
+
+Examples:
+`Jin-Gitaxias, Core Augur` -> `/mctg create jin-gitaxias_core_augur` or `/mctg create jin_gitaxias_core_augur`
+`Bottomless Pool // Locker Room` -> `/mctg create bottomless_pool`
+`Gossip's Talent` -> `/mctg create gossips_talent`
+`Jin-Gitaxias // The Great Synthesis` -> `/mctg create jin-gitaxias` or `/mctg create jin_gitaxias`
+
 Now for the manual part
 - If this is the first time a card is created, you will be left with a giant purple and black box
 - If you are using this mod locally, just press [F3] + [T] to reload your resource packs and the cards will show
@@ -19,6 +29,7 @@ Now for the manual part
 - then uploaded to a hosting site (I use mc-packs.net)
 - Copy the "Download URL" and "SHA-1" entries into the server.properties file 
 - make sure `require-resource-pack` is set to true
+- restart the server
 
 After these steps are followed, you should be ready to start playing
 
