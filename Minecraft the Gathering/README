@@ -1,5 +1,28 @@
-In the chat, type `/mctg create <card_name>` replacing `<card_name>` with the card's name, separating the whitespaces with underscores.
-That will create all the backend files
-Then type `/reload`
-After that type `/function mctg:/cards` and it should come up with a bunch of cards that are inputted. Just choose whichever one you want while holding paper and it'll turn it into that cards.
-There's currently a bit of a hiccup with the resource pack because it has to be manually downloaded, but I'm working on automating that part.
+This fabric mod can be installed onto a server or locally for your own games.
+When you first install this mod, run `/mctg initialize` from the in-game chat window.
+> This will create the backend directory structure used by the mod
+
+To create a card:
+- while holding paper in your main hand, type `/mctg create <card_name>`
+- replace `<card_name>` with the name of the card with the following modifications:
+1. For double sided cards, only use the front side
+1a. For double cards, you can only use the card name on the left as it appears in online card databases
+--> in other words, try the `/mctg create` command with one side of the card 
+--> if that doesn't work, use the other side
+2. Omit apostrophes and punctuations (commas, exclamation points, etc)
+3. Change spaces to underscores (dashes can either be used or changed to underscores as well)
+- wait for a few seconds until the paper changes
+Now for the manual part
+- If this is the first time a card is created, you will be left with a giant purple and black box
+- If you are using this mod locally, just press [F3] + [T] to reload your resource packs and the cards will show
+- If this is on a server, the resource pack has to be zipped and downloaded,
+- then uploaded to a hosting site (I use mc-packs.net)
+- Copy the "Download URL" and "SHA-1" entries into the server.properties file 
+- make sure `require-resource-pack` is set to true
+
+After these steps are followed, you should be ready to start playing
+
+To shuffle the "deck:"
+- hold the bundle containing the deck in your main hand
+- into the chat, type `/mctg shuffle`
+- if an error occurred, check to see if you are holding the bundle in your main hand
