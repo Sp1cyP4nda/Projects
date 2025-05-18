@@ -12,6 +12,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -99,6 +100,7 @@ public class Create {
                 // .replace("/ ","") // Can minecraft:custom_name handle / or |
                 .replace("/", "l") // Can minecraft:custom_name handle // or ||
                 .replace(" ", "_")
+                .replace("-","_")
                 .toLowerCase();
     }
 
@@ -473,7 +475,7 @@ public class Create {
                     makeItemFiles(resourcePATH, card1.getFileName(), card1.getImageUrl());
                     createFile(datapackPATH + mcfunctionPATH, card1.getFileName(), "mcfunction");
                     writeToFile(datapackPATH + mcfunctionPATH + card1.getFileName() + ".mcfunction",
-                            "execute as @p " +
+                            "reload\nexecute as @p " +
                                     "if items entity @p weapon.mainhand minecraft:" +
                                     card1.getMaterial() +
                                     " run item replace entity @p weapon.mainhand " +
@@ -497,8 +499,9 @@ public class Create {
                                     card2.getOracleText() +
                                     "\'}\"],minecraft:item_model=\"card:" +
                                     card1.getFileName() +
-                                    "\"]");
-
+                                    "\",minecraft:custom_data={uuid:\"" +
+                                    UUID.randomUUID().toString() +
+                                    "\"},minecraft:max_stack_size=99]");
                 } else if (Pattern.matches(card_layout, "transform") ||
                         Pattern.matches(card_layout, "modal_dfc") ||
                         Pattern.matches(card_layout, "reversible_card")) {
@@ -551,13 +554,7 @@ public class Create {
                     back.setMaterial(material);
                     back.setName(backFace.get("name"));
                     back.setFileName(backFace.get("name"));
-                    back.setManaCost(backFace.get("mana_cost"));
-                    // if (Pattern.matches(back.getManaCost(),"")) {
-                    // back.setManaCost("Transforms from " + front.getName());
-                    // }
-                    // if (Pattern.matches(front.getManaCost(),"")) {
-                    // front.setManaCost("Turn over for " + back.getName());
-                    // }
+                    back.setManaCost("Transforms from " + front.getName());
                     back.setType(backFace.get("type_line"));
                     back.setOracleText(backFace.get("oracle_text"));
                     back.setImageURL(backFace.get("image_uris"));
@@ -578,7 +575,7 @@ public class Create {
                     // Create trigger mcfunction
                     createFile(datapackPATH + mcfunctionPATH, front.getFileName(), "mcfunction");
                     writeToFile(datapackPATH + mcfunctionPATH + front.getFileName() + ".mcfunction",
-                            "execute as @p " +
+                            "reload\nexecute as @p " +
                                     "if items entity @p weapon.mainhand minecraft:" +
                                     front.getMaterial() +
                                     " run item replace entity @p weapon.mainhand " +
@@ -594,7 +591,9 @@ public class Create {
                                     front.getOracleText() +
                                     "\'}\"],minecraft:item_model=\"card:" +
                                     front.getFileName() +
-                                    "\"]\n" +
+                                    "\",minecraft:custom_data={uuid:\"" +
+                                    UUID.randomUUID().toString() +
+                                    "\"},minecraft:max_stack_size=99]\n" +
 
                                     "execute as @p " +
                                     "if items entity @p weapon.mainhand minecraft:" +
@@ -612,7 +611,9 @@ public class Create {
                                     back.getOracleText() +
                                     "\'}\"],minecraft:item_model=\"card:" +
                                     back.getFileName() +
-                                    "\"]");
+                                    "\",minecraft:custom_data={uuid:\"" +
+                                    UUID.randomUUID().toString() +
+                                    "\"},minecraft:max_stack_size=1]");
 
                     logger.info("mcfunction file created successfully.");
                 } else {
@@ -649,7 +650,7 @@ public class Create {
                     // Create trigger mcfunction
                     createFile(datapackPATH + mcfunctionPATH, card.getFileName(), "mcfunction");
                     writeToFile(datapackPATH + mcfunctionPATH + card.getFileName() + ".mcfunction",
-                            "execute as @p " +
+                            "reload\nexecute as @p " +
                                     "if items entity @p weapon.mainhand minecraft:" +
                                     card.getMaterial() +
                                     " run item replace entity @p weapon.mainhand " +
@@ -665,9 +666,10 @@ public class Create {
                                     card.getOracleText() +
                                     "\'}\"],minecraft:item_model=\"card:" +
                                     card.getFileName() +
-                                    "\"]");
+                                    "\",minecraft:custom_data={uuid:\"" +
+                                    UUID.randomUUID().toString() +
+                                    "\"},minecraft:max_stack_size=99]");
                 } // I should do an entry for "meld" layouts to show "related cards"
-
             }
         } catch (Exception e) {
             e.printStackTrace();
