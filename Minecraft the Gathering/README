@@ -5,12 +5,8 @@ When you first install this mod, run `/mctg initialize` from the in-game chat wi
 To create a card:
 - while holding paper in your main hand, type `/mctg create <card_name>`
 - replace `<card_name>` with the name of the card with the following modifications:
-1. For double sided cards, only use the front side
-1a. For double cards, you can only use the card name on the left as it appears in online card databases
---> in other words, try the `/mctg create` command with one side of the card 
---> if that doesn't work, use the other side
-2. Omit apostrophes and punctuations (commas, exclamation points, etc)
-3. Change spaces to underscores (dashes can either be used or changed to underscores as well)
+1. Omit apostrophes and punctuations (commas, exclamation points, etc)
+2. Change spaces to underscores or dashes (can also omit spaces altogether, if that's preferable)
 - wait for a few seconds until the paper changes
 - Double sided cards will give you the back as a separate card
 - Only the front can fit in the bundle
@@ -29,7 +25,7 @@ Now for the manual part
 - then uploaded to a hosting site (I use mc-packs.net)
 - Copy the "Download URL" and "SHA-1" entries into the server.properties file 
 - make sure `require-resource-pack` is set to true
-- restart the server
+- You shouldn't have to restart the server, but if the cards aren't loading, give that a shot
 
 After these steps are followed, you should be ready to start playing
 
