@@ -4,6 +4,7 @@ Created CHANGLOG file
 Updated README to make it more complete and look more professional
 MCtGv1.2.1.2+MC1.2.1.4:
     - Hotfixed issue where backend mcfunction files weren't always being properly deleted after using `/mctg create`
+    - Changed logging to be more organized. Instead of creating a log for a card, it creates a log for the day `/mctg create` was used and puts all card queries invoked in there.
 
 19May25:
 MCtGv1.2.1.1+MC1.2.1.4:
