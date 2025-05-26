@@ -10,6 +10,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -100,7 +103,7 @@ public class Create {
                 // .replace("/ ","") // Can minecraft:custom_name handle / or |
                 .replace("/", "l") // Can minecraft:custom_name handle // or ||
                 .replace(" ", "_")
-                .replace("-","_")
+                .replace("-", "_")
                 .toLowerCase();
     }
 
@@ -382,8 +385,11 @@ public class Create {
             Create search = new Create();
             search.setSearch(args[0]);
 
-            // Setup logger for new query
-            setupLogger(datapackPATH + "logs/" + search.getSearch() + ".log");
+            // Setup logger
+            Date date = new Date();
+            SimpleDateFormat formatter = new SimpleDateFormat("YYYY_MM_dd");
+            String formattedDate = formatter.format(date);
+            setupLogger(datapackPATH + "logs/" + formattedDate + ".log");
             logger.info("\n\nNew query: " + search.getSearch());
 
             URL url = new URL("https://api.scryfall.com/cards/named?fuzzy=" + search.getSearch());
@@ -411,13 +417,27 @@ public class Create {
                 String card_layout = checkLayout.get("layout");
                 String material = args[1];
                 String mcfunctionPATH = "data/mctg/function/cards/";
-                logger.info("\n\nOutside conditionals; Card layout == " + card_layout + " " + material);
+                String mcfunctionNAME = args[0]
+                        .replace(",", "")
+                        .replace("'", "")
+                        .replace("\\\\", "")
+                        .replace("!", "")
+                        .replace("?", "")
+                        .replace("/", "l") // Can minecraft:custom_name handle // or ||
+                        .replace(" ", "_")
+                        .replace("-", "_")
+                        .toLowerCase();
+                logger.info("\n\nOutside conditionals; Card layout == " + card_layout);
 
                 // Create the card, depending on card_layout
+
+                //////////////////
+                // Split Layout //
+                //////////////////
                 if (Pattern.matches(card_layout, "split") ||
                         Pattern.matches(card_layout, "flip") ||
                         Pattern.matches(card_layout, "adventure")) {
-                    logger.info("Inside layout: " + card_layout + " " + material);
+                    logger.info("Inside layout: " + card_layout);
                     Map<String, String> extractedURI = extractJsonValues(json, "image_uris");
                     Map<String, String> extractedData = extractJsonValues(json, "card_faces");
 
@@ -428,7 +448,7 @@ public class Create {
                             .replace("\n", "")
                             .replace("[{", "")
                             .replace("}]", "")
-                            .split("},");
+                            .split("\"},");
                     logger.info("Cards:\n" + card);
 
                     Map<String, String> cardOne = extractJsonValues(card[0],
@@ -473,8 +493,10 @@ public class Create {
 
                     // Make the backend files
                     makeItemFiles(resourcePATH, card1.getFileName(), card1.getImageUrl());
-                    createFile(datapackPATH + mcfunctionPATH, card1.getFileName(), "mcfunction");
-                    writeToFile(datapackPATH + mcfunctionPATH + card1.getFileName() + ".mcfunction",
+
+                    // Create trigger mcfunction
+                    createFile(datapackPATH + mcfunctionPATH, mcfunctionNAME, "mcfunction");
+                    writeToFile(datapackPATH + mcfunctionPATH + mcfunctionNAME + ".mcfunction",
                             "reload\nexecute as @p " +
                                     "if items entity @p weapon.mainhand minecraft:" +
                                     card1.getMaterial() +
@@ -505,8 +527,11 @@ public class Create {
                 } else if (Pattern.matches(card_layout, "transform") ||
                         Pattern.matches(card_layout, "modal_dfc") ||
                         Pattern.matches(card_layout, "reversible_card")) {
-                    logger.info("Inside layout: " + card_layout + " " + material);
-                    // Double faced cards
+                    logger.info("Inside layout: " + card_layout);
+
+                    ////////////////////////
+                    // Double faced cards //
+                    ////////////////////////
                     Map<String, String> extractedData = extractJsonValues(json, "card_faces");
 
                     logger.info("Data extracted successfully: " + extractedData);
@@ -516,7 +541,7 @@ public class Create {
                             .replace("\n", "")
                             .replace("[{", "")
                             .replace("}]", "")
-                            .split("},");
+                            .split("}},");
                     // String[] faces = null;
 
                     logger.info("Card faces: " + faces);
@@ -573,8 +598,8 @@ public class Create {
                     logger.info("Backend files created successfully.");
 
                     // Create trigger mcfunction
-                    createFile(datapackPATH + mcfunctionPATH, front.getFileName(), "mcfunction");
-                    writeToFile(datapackPATH + mcfunctionPATH + front.getFileName() + ".mcfunction",
+                    createFile(datapackPATH + mcfunctionPATH, mcfunctionNAME, "mcfunction");
+                    writeToFile(datapackPATH + mcfunctionPATH + mcfunctionNAME + ".mcfunction",
                             "reload\nexecute as @p " +
                                     "if items entity @p weapon.mainhand minecraft:" +
                                     front.getMaterial() +
@@ -617,7 +642,10 @@ public class Create {
 
                     logger.info("mcfunction file created successfully.");
                 } else {
-                    logger.info("Inside layout: " + card_layout + " " + material);
+                    ///////////////////
+                    // Normal Layout //
+                    ///////////////////
+                    logger.info("Inside layout: " + card_layout);
                     Map<String, String> extractedData = extractJsonValues(json,
                             "name",
                             "mana_cost",
@@ -648,8 +676,8 @@ public class Create {
                     makeItemFiles(resourcePATH, card.getFileName(), card.getImageUrl());
 
                     // Create trigger mcfunction
-                    createFile(datapackPATH + mcfunctionPATH, card.getFileName(), "mcfunction");
-                    writeToFile(datapackPATH + mcfunctionPATH + card.getFileName() + ".mcfunction",
+                    createFile(datapackPATH + mcfunctionPATH, mcfunctionNAME, "mcfunction");
+                    writeToFile(datapackPATH + mcfunctionPATH + mcfunctionNAME + ".mcfunction",
                             "reload\nexecute as @p " +
                                     "if items entity @p weapon.mainhand minecraft:" +
                                     card.getMaterial() +
