@@ -1,7 +1,9 @@
-20May25:
-Created a license file
+26May25:
+Created a LICENSE file
 Created CHANGLOG file
 Updated README to make it more complete and look more professional
+MCtGv1.2.1.2+MC1.2.1.4:
+    - Hotfixed issue where backend mcfunction files weren't always being properly deleted after using `/mctg create`
 
 19May25:
 MCtGv1.2.1.1+MC1.2.1.4:
@@ -21,7 +23,6 @@ MCtGv1.2.0:
 Updated project files to reflect these changes
 Reorganized Gallery directory
 Added new project images to the Gallery directory
-
 
 20Apr25:
 Reorganized project pictures into their own Gallery directory
