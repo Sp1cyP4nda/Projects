@@ -1,35 +1,151 @@
-This fabric mod can be installed onto a server or locally for your own games.
-When you first install this mod, run `/mctg initialize` from the in-game chat window.
-> This will create the backend directory structure used by the mod
+# Minecraft the Gathering (MCtG)
+*Import Magic: The Gathering cards into Minecraft as custom items!*
 
-To create a card:
-- while holding paper in your main hand, type `/mctg create <card_name>`
-- replace `<card_name>` with the name of the card with the following modifications:
-1. Omit apostrophes and punctuations (commas, exclamation points, etc)
-2. Change spaces to underscores or dashes (can also omit spaces altogether, if that's preferable)
-- wait for a few seconds until the paper changes
-- Double sided cards will give you the back as a separate card
-- Only the front can fit in the bundle
--> I made this decision so the backside can't accidentally get shuffled into the deck
+**Created by:** Sp1cyP4nda  
+**Contact:** mctg@sp1cyp4nda.addy.io  
+**License:** [CC BY-NC-ND 4.0](https://creativecommons.org/licenses/by-nc-nd/4.0/)
 
-Examples:
-`Jin-Gitaxias, Core Augur` -> `/mctg create jin-gitaxias_core_augur` or `/mctg create jin_gitaxias_core_augur`
-`Bottomless Pool // Locker Room` -> `/mctg create bottomless_pool`
-`Gossip's Talent` -> `/mctg create gossips_talent`
-`Jin-Gitaxias // The Great Synthesis` -> `/mctg create jin-gitaxias` or `/mctg create jin_gitaxias`
+---
 
-Now for the manual part
-- If this is the first time a card is created, you will be left with a giant purple and black box
-- If you are using this mod locally, just press [F3] + [T] to reload your resource packs and the cards will show
-- If this is on a server, the resource pack has to be zipped and downloaded,
-- then uploaded to a hosting site (I use mc-packs.net)
-- Copy the "Download URL" and "SHA-1" entries into the server.properties file 
-- make sure `require-resource-pack` is set to true
-- You shouldn't have to restart the server, but if the cards aren't loading, give that a shot
+## 🎴 Overview
+**Minecraft the Gathering (MCtG)** is a Minecraft mod that allows you to import **Magic: The Gathering** cards as in-game items using the [Scryfall API](https://scryfall.com/docs/api). Build decks by bundling cards together and shuffle them using in-game commands.
 
-After these steps are followed, you should be ready to start playing
+This mod is built for the **Fabric API** and is compatible with Minecraft **1.21.4**. It can be installed locally or on a server.
 
-To shuffle the "deck:"
-- hold the bundle containing the deck in your main hand
-- into the chat, type `/mctg shuffle`
-- if an error occurred, check to see if you are holding the bundle in your main hand
+---
+
+## ✨ Features
+
+- 📥 `/mctg create <card_name>`  
+  Import any Magic card from Scryfall into the game as a custom item.
+
+- 🃏 Card items as paper  
+  Imported cards use Minecraft’s paper item, with custom textures and metadata.
+
+- 📦 Bundle support  
+  You can store up to 99 cards in a bundle to represent a deck.
+
+- 🔄 `/mctg shuffle`  
+  Shuffle the cards in a bundle held in your main hand.
+
+---
+
+## 🛠️ Installation
+
+1. Install [Fabric Loader](https://fabricmc.net/use/) for Minecraft 1.21.4.
+2. Install the [Fabric API](https://modrinth.com/mod/fabric-api).
+3. Download and place the `mctg-<version>.jar` file into your `mods` folder.
+4. Launch Minecraft using the Fabric profile.
+
+---
+
+## 🚀 Getting Started
+
+### 🔧 Initialization (Run Once)
+
+After installation, open your Minecraft world and run:
+```bash
+/mctg initialize
+````
+
+> This creates the backend folder structure used to store card data and textures.
+
+---
+
+### 🃏 Creating a Card
+
+1. Hold a piece of paper in your main hand.
+2. Use the command:
+
+```bash
+/mctg create <card_name>
+```
+
+**Formatting Tips:**
+
+* Remove punctuation like apostrophes, commas, etc.
+* Replace spaces with `_`, `-`, or remove them entirely
+
+#### ✅ Examples
+
+* `Jin-Gitaxias, Core Augur` → `/mctg create jin-gitaxias_core_augur` or `/mctg create jin_gitaxias_core_augur`
+* `Bottomless Pool // Locker Room` → `/mctg create bottomless_pool`
+* `Gossip's Talent` → `/mctg create gossips_talent`
+* `Jin-Gitaxias // The Great Synthesis` → `/mctg create jin-gitaxias`
+
+#### 🔁 Double-Faced Cards
+
+* You will receive both front and back cards.
+* Only the **front** will "fit" inside bundles (to prevent accidental inclusion of the back during shuffling).
+
+---
+
+### 🎨 Fixing Purple Textures
+
+#### For **Local Installation**:
+
+* Press `[F3] + [T]` to reload your resource packs after creating a card.
+
+#### For **Servers**:
+
+1. Compress your generated resource pack folder into a ZIP file.
+2. Upload to a hosting site (e.g., [mc-packs.net](https://mc-packs.net)).
+3. In `server.properties`, configure:
+
+```properties
+   resource-pack=https://your-link.com/resourcepack.zip
+   resource-pack-sha1=<sha1_hash>
+   require-resource-pack=true
+```
+
+4. Restart the server if needed.
+
+> Note: hosting it in this way only works until the resource pack exceeds 50MB, at which point players will need to download the pack manually.
+
+---
+
+### 🔄 Shuffling the Deck
+
+1. Hold a bundle with cards in your **main hand**.
+2. Run:
+
+```bash
+/mctg shuffle
+```
+
+> If an error occurs, confirm that you are holding a bundle with card items.
+
+---
+
+## ⚖️ License
+
+This mod is licensed under the [Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License](https://creativecommons.org/licenses/by-nc-nd/4.0/).
+
+You **may**:
+
+* Use and share the mod in its original form
+* Include it in **non-commercial** modpacks with attribution
+* Use it on servers (even monetized ones), as long as the mod itself is not monetized
+
+You **may not**:
+
+* Sell, modify, or redistribute altered versions of the mod
+* Use it for any direct commercial purpose
+
+See LICENSE.txt for full terms.
+
+---
+
+## 💬 Feedback & Contributions
+
+Feedback, ideas, and respectful collaboration are welcome!
+📧 Email: [mctg@sp1cyp4nda.addy.io](mailto:mctg@sp1cyp4nda.addy.io)
+
+---
+
+## 🔮 Special Thanks
+
+* [Scryfall](https://scryfall.com/) for the incredible Magic card database
+* The Minecraft modding community for making Fabric great
+
+---
