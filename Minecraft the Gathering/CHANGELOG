@@ -1,0 +1,37 @@
+20May25:
+Created a license file
+Created CHANGLOG file
+Updated README to make it more complete and look more professional
+
+19May25:
+MCtGv1.2.1.1+MC1.2.1.4:
+    - Added a hotfix to handle cards that wouldn't import (like Hostile Hostel)
+    - Made it easier to import cards. <card_name> no longer needs to be exact
+    - Added compatible Minecraft version number
+Updated README file
+
+18May25:
+Major updates
+MCtGv1.2.1:
+    - Hides bundle contents after using `/mctg shuffle` on that bundle
+MCtGv1.2.0:
+    - Added the ability to put 99 cards in a bundle
+    - Card back's no longer fit inside bundles
+    - Added `/mctg shuffle` command
+Updated project files to reflect these changes
+Reorganized Gallery directory
+Added new project images to the Gallery directory
+
+
+20Apr25:
+Reorganized project pictures into their own Gallery directory
+Uploaded new project images to the newly created Gallery
+
+19Apr25:
+MCtGv1.1.0 added the ability to handle various card layouts
+
+6Apr25:
+First upload of mod, MCtGv1.0.0
+First upload of project files
+First upload of project pictures
+Created first README
