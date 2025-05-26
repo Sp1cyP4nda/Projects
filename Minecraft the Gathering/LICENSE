@@ -1,0 +1,31 @@
+Minecraft the Gathering (MCtG) Mod  
+Copyright (c) Sp1cyP4nda
+
+This mod is licensed under the Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License (CC BY-NC-ND 4.0).
+
+Summary:
+You are free to:
+- Share — copy and redistribute the unmodified version of this mod in any medium or format
+
+Under the following terms:
+- Attribution — You must give appropriate credit to the original author Sp1cyP4nda, provide a link to the original distribution page (if applicable), and indicate that no changes were made. You may not suggest that the author endorses you or your use.
+- NonCommercial — You may not use this mod or its contents for commercial purposes. This includes:
+  - Paid downloads or mod hosting
+  - Paid modpacks or subscriptions
+  - Monetizing modified or redistributed versions
+- NoDerivatives — You may modify the mod for personal use only. You may not distribute modified versions, in whole or in part, without written permission from the author.
+
+Additional Permissions:
+- You may include this mod in a freely distributed modpack, provided the mod is unmodified, attribution is included, and the pack itself is not monetized.
+- You may use this mod on public or private Minecraft servers, including income-generating servers (e.g. donations or cosmetic perks), as long as the mod itself is not the monetized component.
+
+Dependencies:
+- This mod requires the Fabric API to function.
+- The MCtG mod uses the public Scryfall API to import Magic: The Gathering card data and assets. Scryfall data is licensed under the Creative Commons Attribution-NonCommercial 4.0 license.
+
+Contact:
+If you have ideas, questions, or would like to request permission for extended use (e.g., modifications or collaborations), feel free to contact me at:
+
+mctg@sp1cyp4nda.addy.io
+
+Full license text: https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode
