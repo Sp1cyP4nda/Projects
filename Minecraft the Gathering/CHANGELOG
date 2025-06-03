@@ -1,3 +1,21 @@
+02June25:
+Fixed the permissions issue
+    - Previously, only players with permissions 2 or higher could use `/mctg create`
+Now checks to see if the player is holding only 1 paper
+    - Previously, it only checked to see if a player was holding paper
+    - This means if a player was holding a full stack of paper, `/mctg create` would turn the entire stack into a single card
+No longer gives a free card with double-sided cards
+    - Double-sided cards now require the player to hold a paper in their main hand and off hand
+    - Previously, when using `/mctg create` on a double sided card, the held card would change to the desired card and that card's backside was given to the player
+    - This could have potentially been abused
+Card text is no longer italicized
+`/mctg create` no longer creates .mcfunction files
+Can now create a deck package
+    - `/mctg initialize` creates a deck_bundle.mcfunction that can be called with `/mctg create deck_bundle`
+    - Must be a player with permissions level 2 or higher
+Server admins can also set a welcome package
+    - Using a give command generator, server admins have the option to create a file called `welcome_package.mcfunction` that gives a welcome package to players with permissions 2 or higher when entering `/mctg create welcome_package` into the chat. This can be used to give welcome packages to players that are new to the server.
+
 26May25:
 Created a LICENSE file
 Created CHANGLOG file
@@ -33,7 +51,7 @@ Uploaded new project images to the newly created Gallery
 19Apr25:
 MCtGv1.1.0 added the ability to handle various card layouts
 
-6Apr25:
+06Apr25:
 First upload of mod, MCtGv1.0.0
 First upload of project files
 First upload of project pictures
