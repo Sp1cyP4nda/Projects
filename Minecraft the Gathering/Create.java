@@ -9,9 +9,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,7 +34,8 @@ public class Create {
     String type_line = " ";
     String oracle_text = " ";
     String image_url = " ";
-    String filePath = " ";
+    String logPath = " ";
+    String layout = " ";
 
     // Getters
     public String getMaterial() {
@@ -69,8 +70,12 @@ public class Create {
         return image_url;
     }
 
-    public String getFilePath() {
-        return filePath;
+    public String getLogFilePath() {
+        return logPath;
+    }
+
+    public String getLayout() {
+        return layout;
     }
 
     // Setters
@@ -84,13 +89,16 @@ public class Create {
                 .replace(" ", "+")
                 .replace("\'", "%27")
                 .toLowerCase();
+        logger.info("\n\nNew Search: " + search + "\n\n");
     }
 
     public void setName(String newName) {
         this.name = newName
-                .replace(",", "")
-                .replace("\\\\'", "'")
-                .replace(" ", " ");
+        // .replace(",", "")
+        // .replace("\\\\'", "'")
+        // .replace(" ", " ")
+        ;
+        logger.info("Name set: " + name);
     }
 
     public void setFileName(String newFileName) {
@@ -105,26 +113,65 @@ public class Create {
                 .replace(" ", "_")
                 .replace("-", "_")
                 .toLowerCase();
+        logger.info("Filename set: " + filename);
     }
 
     public void setManaCost(String newManaCost) {
         this.mana_cost = newManaCost;
+        logger.info("Mana cost set: " + mana_cost);
     }
 
     public void setType(String newType) {
         this.type_line = newType;
+        logger.info("Type set: " + type_line);
     }
 
     public void setOracleText(String newOracleText) {
         this.oracle_text = newOracleText;
+        logger.info("Oracle text set: " + oracle_text);
     }
 
     public void setImageURL(String newImageURL) {
         this.image_url = newImageURL;
+        logger.info("Image URL set: " + image_url);
+    }
+
+    public void setLayout(String newLayout) {
+        this.layout = newLayout;
+        logger.info("Layout set: " + layout);
     }
 
     public void setLogFilePath(String newPath) {
-        this.filePath = newPath;
+        this.logPath = newPath;
+        logger.info("Log filePath set: " + logPath);
+    }
+
+    // Get card info JSON
+    public static String getCardInfo(String cardName) {
+        try {
+            URL url = new URL("https://api.scryfall.com/cards/named?fuzzy=" + cardName);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            int responseCode = connection.getResponseCode();
+            if (responseCode != 200) {
+                logger.info("Error code " + responseCode + " when attempting to connect. Quitting...");
+            } else {
+                BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                String inputLine;
+                StringBuffer response = new StringBuffer();
+
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
+                String json = response.toString();
+                return json;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            logger.info("An error occurred when accessing URL");
+        }
+        return null;
     }
 
     // Extract JSON Values
@@ -132,6 +179,9 @@ public class Create {
         Map<String, String> values = new HashMap<>();
         // String[] faces = null;
         for (String key : keys) {
+            if (Pattern.matches(key, "layout")) {
+                logger.info("\n\nNew Query Request:");
+            }
             if (Pattern.matches(key, "card_faces")) {
                 Pattern facesPattern = Pattern.compile("\"" + key + "\"\\s*:\\s*(\\[.*?\\}\\])", Pattern.DOTALL);
                 Matcher facesMatcher = facesPattern.matcher(json);
@@ -153,10 +203,11 @@ public class Create {
                 }
                 if (regularMatcher.find()) {
                     String extractedText = regularMatcher.group(1)
-                            .replace("'", "\\\\'")
+                            // .replace("'", "\\\\'")
                             .replace("\u2014", "-");
                     if (key.equals("oracle_text")) {
-                        extractedText = formatOracleText(extractedText, 65);
+                        extractedText = formatOracleText(extractedText.replace("\\n", "\\n\\n").replace("\\\"", "\""),
+                                69);
                     }
                     values.put(key, extractedText);
                     logger.info("Other values: " + values);
@@ -177,7 +228,9 @@ public class Create {
             if (nextBreak == -1)
                 break; // No whitespace found, avoid infinite loop
 
-            formattedText.append(text, lastBreak, nextBreak).append("\'}\",\"{\'text\':\'");
+            // formattedText.append(text, lastBreak,
+            // nextBreak).append("\'}\",\"{\'text\':\'");
+            formattedText.append(text, lastBreak, nextBreak).append("\\n");
             lastBreak = nextBreak + 1; // Move past the whitespace
         }
 
@@ -189,8 +242,10 @@ public class Create {
         logger.info("Oracle Text: " + formattedText);
         return formattedText
                 .toString()
-                // .replace("'","\\\\'") // Handle escaped single quotes
-                .replace("\\n", "\'}\",\"{\'text\':\'\'}\",\"{\'text\':\'"); // Handle newlines;
+        // .replace("'","\\\\'") // Handle escaped single quotes
+        // .replace("\\n", "\'}\",\"{\'text\':\'\'}\",\"{\'text\':\'"); // Handle
+        // newlines
+        ;
     }
 
     // Extract URI
@@ -233,101 +288,111 @@ public class Create {
 
     // Make the backend files
     public static void makeItemFiles(String path, String filename, String imgURL) {
-        createFile(path + "assets/card/items/", filename, "json");
-        createFile(path + "assets/card/models/item/", filename, "json");
 
         // Write to the Backend Files
-        writeToFile(path + "assets/card/items/" + filename + ".json",
-                "{\r\n" +
-                        "    \"model\": {\r\n" +
-                        "        \"type\": \"minecraft:model\",\r\n" +
-                        "        \"model\": \"card:item/" +
-                        filename +
-                        "\"\r\n" +
-                        "    }\r\n" +
-                        "}");
-        writeToFile(path + "assets/card/models/item/" + filename + ".json",
-                "{\r\n" +
-                        "    \"parent\": \"minecraft:item/handheld\",\r\n" +
-                        "    \"textures\": {\r\n" +
-                        "      \"layer0\": \"card:item/card_back\",\r\n" +
-                        "      \"layer1\": \"card:item/" +
-                        filename +
-                        "\",\r\n" +
-                        "      \"layer2\": \"minecraft:block/oak_log\"\r\n" +
-                        "    },\r\n" +
-                        "    \"elements\": [\r\n" +
-                        "        {\r\n" +
-                        "          \"from\": [\r\n" +
-                        "            0,\r\n" +
-                        "            0,\r\n" +
-                        "            7.85\r\n" +
-                        "          ],\r\n" +
-                        "          \"to\": [\r\n" +
-                        "            16,\r\n" +
-                        "            16,\r\n" +
-                        "            8\r\n" +
-                        "          ],\r\n" +
-                        "          \"faces\":{\r\n" +
-                        "            \"south\": {\r\n" +
-                        "              \"texture\": \"#layer1\"\r\n" +
-                        "            },\r\n" +
-                        "            \"north\": {\r\n" +
-                        "              \"texture\": \"#layer0\"\r\n" +
-                        "            },\r\n" +
-                        "            \"up\": {\r\n" +
-                        "              \"texture\": \"#layer2\"\r\n" +
-                        "            },\r\n" +
-                        "            \"down\": {\r\n" +
-                        "              \"texture\": \"#layer2\"\r\n" +
-                        "            },\r\n" +
-                        "            \"west\": {\r\n" +
-                        "              \"texture\": \"#layer2\"\r\n" +
-                        "            },\r\n" +
-                        "            \"east\": {\r\n" +
-                        "              \"texture\": \"#layer2\"\r\n" +
-                        "            }\r\n" +
-                        "          }\r\n" +
-                        "        }\r\n" +
-                        "    ],\r\n" +
-                        "    \"display\": {\r\n" +
-                        "      \"thirdperson_righthand\": {\r\n" +
-                        "            \"rotation\": [ 45, 0, -5 ],\r\n" +
-                        "            \"translation\": [ 0, 6, -1 ],\r\n" +
-                        "            \"scale\": [ 0.75, 1, 1 ]\r\n" +
-                        "        },\r\n" +
-                        "        \"thirdperson_lefthand\": {\r\n" +
-                        "            \"rotation\": [ 45, 0, -5 ],\r\n" +
-                        "            \"translation\": [ 0, 6, -1 ],\r\n" +
-                        "            \"scale\": [ 0.75, 1, 1 ]\r\n" +
-                        "        },\r\n" +
-                        "        \"firstperson_righthand\": {\r\n" +
-                        "            \"rotation\": [ 0, 0, 5 ],\r\n" +
-                        "            \"translation\": [ 10, 0, -10 ],\r\n" +
-                        "            \"scale\": [ 1.25, 1.25, 1.25 ]\r\n" +
-                        "        },\r\n" +
-                        "        \"firstperson_lefthand\": {\r\n" +
-                        "            \"rotation\": [ 0, 0, 5 ],\r\n" +
-                        "            \"translation\": [ 10, 0, -10 ],\r\n" +
-                        "            \"scale\": [ 1.25, 1.25, 1.25 ]\r\n" +
-                        "        },\r\n" +
-                        "        \"gui\": {\r\n" +
-                        "            \"rotation\": [ -15, 20, -5 ],\r\n" +
-                        "            \"translation\": [ 0, 0, 0 ],\r\n" +
-                        "            \"scale\": [ 0.65, 0.85, 0.85 ]\r\n" +
-                        "        }, \r\n" +
-                        "        \"fixed\": {\r\n" +
-                        "            \"rotation\": [ 0, -180, 0 ],\r\n" +
-                        "            \"translation\": [ 0, 0, 0 ],\r\n" +
-                        "            \"scale\": [ 0.75, 1.15, 1.15 ]\r\n" +
-                        "        },\r\n" +
-                        "        \"ground\": {\r\n" +
-                        "            \"rotation\": [ 0, 0, 0 ],\r\n" +
-                        "            \"translation\": [ 0, 2.5, 0 ],\r\n" +
-                        "            \"scale\": [ 0.35, 0.55, 0.55 ]\r\n" +
-                        "        }\r\n" +
-                        "  }\r\n" +
-                        "}");
+        try {
+            createFile(path + "assets/card/items/", filename, "json");
+            writeToFile(path + "assets/card/items/" + filename + ".json",
+                    "{\r\n" +
+                            "    \"model\": {\r\n" +
+                            "        \"type\": \"minecraft:model\",\r\n" +
+                            "        \"model\": \"card:item/" +
+                            filename +
+                            "\"\r\n" +
+                            "    }\r\n" +
+                            "}");
+            logger.info("Items file created successfully");
+        } catch (Exception e) {
+            logger.info("An error occurred when creating Items file");
+        }
+        try {
+            createFile(path + "assets/card/models/item/", filename, "json");
+            writeToFile(path + "assets/card/models/item/" + filename + ".json",
+                    "{\r\n" +
+                            "    \"parent\": \"minecraft:item/handheld\",\r\n" +
+                            "    \"textures\": {\r\n" +
+                            "      \"layer0\": \"card:item/card_back\",\r\n" +
+                            "      \"layer1\": \"card:item/" +
+                            filename +
+                            "\",\r\n" +
+                            "      \"layer2\": \"minecraft:block/oak_log\"\r\n" +
+                            "    },\r\n" +
+                            "    \"elements\": [\r\n" +
+                            "        {\r\n" +
+                            "          \"from\": [\r\n" +
+                            "            0,\r\n" +
+                            "            0,\r\n" +
+                            "            7.85\r\n" +
+                            "          ],\r\n" +
+                            "          \"to\": [\r\n" +
+                            "            16,\r\n" +
+                            "            16,\r\n" +
+                            "            8\r\n" +
+                            "          ],\r\n" +
+                            "          \"faces\":{\r\n" +
+                            "            \"south\": {\r\n" +
+                            "              \"texture\": \"#layer1\"\r\n" +
+                            "            },\r\n" +
+                            "            \"north\": {\r\n" +
+                            "              \"texture\": \"#layer0\"\r\n" +
+                            "            },\r\n" +
+                            "            \"up\": {\r\n" +
+                            "              \"texture\": \"#layer2\"\r\n" +
+                            "            },\r\n" +
+                            "            \"down\": {\r\n" +
+                            "              \"texture\": \"#layer2\"\r\n" +
+                            "            },\r\n" +
+                            "            \"west\": {\r\n" +
+                            "              \"texture\": \"#layer2\"\r\n" +
+                            "            },\r\n" +
+                            "            \"east\": {\r\n" +
+                            "              \"texture\": \"#layer2\"\r\n" +
+                            "            }\r\n" +
+                            "          }\r\n" +
+                            "        }\r\n" +
+                            "    ],\r\n" +
+                            "    \"display\": {\r\n" +
+                            "      \"thirdperson_righthand\": {\r\n" +
+                            "            \"rotation\": [ 45, 0, -5 ],\r\n" +
+                            "            \"translation\": [ 0, 6, -1 ],\r\n" +
+                            "            \"scale\": [ 0.75, 1, 1 ]\r\n" +
+                            "        },\r\n" +
+                            "        \"thirdperson_lefthand\": {\r\n" +
+                            "            \"rotation\": [ 45, 0, -5 ],\r\n" +
+                            "            \"translation\": [ 0, 6, -1 ],\r\n" +
+                            "            \"scale\": [ 0.75, 1, 1 ]\r\n" +
+                            "        },\r\n" +
+                            "        \"firstperson_righthand\": {\r\n" +
+                            "            \"rotation\": [ 0, 0, 5 ],\r\n" +
+                            "            \"translation\": [ 10, 0, -10 ],\r\n" +
+                            "            \"scale\": [ 1.25, 1.25, 1.25 ]\r\n" +
+                            "        },\r\n" +
+                            "        \"firstperson_lefthand\": {\r\n" +
+                            "            \"rotation\": [ 0, 0, 5 ],\r\n" +
+                            "            \"translation\": [ 10, 0, -10 ],\r\n" +
+                            "            \"scale\": [ 1.25, 1.25, 1.25 ]\r\n" +
+                            "        },\r\n" +
+                            "        \"gui\": {\r\n" +
+                            "            \"rotation\": [ -15, 20, -5 ],\r\n" +
+                            "            \"translation\": [ 0, 0, 0 ],\r\n" +
+                            "            \"scale\": [ 0.65, 0.85, 0.85 ]\r\n" +
+                            "        }, \r\n" +
+                            "        \"fixed\": {\r\n" +
+                            "            \"rotation\": [ 0, -180, 0 ],\r\n" +
+                            "            \"translation\": [ 0, 0, 0 ],\r\n" +
+                            "            \"scale\": [ 0.75, 1.15, 1.15 ]\r\n" +
+                            "        },\r\n" +
+                            "        \"ground\": {\r\n" +
+                            "            \"rotation\": [ 0, 0, 0 ],\r\n" +
+                            "            \"translation\": [ 0, 2.5, 0 ],\r\n" +
+                            "            \"scale\": [ 0.35, 0.55, 0.55 ]\r\n" +
+                            "        }\r\n" +
+                            "  }\r\n" +
+                            "}");
+            logger.info("Models file created successfully");
+        } catch (Exception e) {
+            logger.info("An error occurred when creating Models file");
+        }
         // Create the textures file
         try {
             // Download the textures file
@@ -398,7 +463,6 @@ public class Create {
             int responseCode = connection.getResponseCode();
             if (responseCode != 200) {
                 logger.info("Error code " + responseCode + ". Quitting.");
-                logger.info("Error code " + responseCode + ". Quitting.");
             } else {
                 BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
                 String inputLine;
@@ -414,7 +478,9 @@ public class Create {
                 Map<String, String> checkLayout = extractJsonValues(json, "layout");
 
                 // Set global variables
-                String card_layout = checkLayout.get("layout");
+                // String card_layout = checkLayout.get("layout");
+                Create card_layout = new Create();
+                card_layout.setLayout(checkLayout.get("layout"));
                 String material = args[1];
                 String mcfunctionPATH = "data/mctg/function/cards/";
                 String mcfunctionNAME = args[0]
@@ -434,9 +500,9 @@ public class Create {
                 //////////////////
                 // Split Layout //
                 //////////////////
-                if (Pattern.matches(card_layout, "split") ||
-                        Pattern.matches(card_layout, "flip") ||
-                        Pattern.matches(card_layout, "adventure")) {
+                if (Pattern.matches(card_layout.getLayout(), "split") ||
+                        Pattern.matches(card_layout.getLayout(), "flip") ||
+                        Pattern.matches(card_layout.getLayout(), "adventure")) {
                     logger.info("Inside layout: " + card_layout);
                     Map<String, String> extractedURI = extractJsonValues(json, "image_uris");
                     Map<String, String> extractedData = extractJsonValues(json, "card_faces");
@@ -497,7 +563,7 @@ public class Create {
                     // Create trigger mcfunction
                     createFile(datapackPATH + mcfunctionPATH, mcfunctionNAME, "mcfunction");
                     writeToFile(datapackPATH + mcfunctionPATH + mcfunctionNAME + ".mcfunction",
-                            "reload\nexecute as @p " +
+                            "execute as @p " +
                                     "if items entity @p weapon.mainhand minecraft:" +
                                     card1.getMaterial() +
                                     " run item replace entity @p weapon.mainhand " +
@@ -524,9 +590,9 @@ public class Create {
                                     "\",minecraft:custom_data={uuid:\"" +
                                     UUID.randomUUID().toString() +
                                     "\"},minecraft:max_stack_size=99]");
-                } else if (Pattern.matches(card_layout, "transform") ||
-                        Pattern.matches(card_layout, "modal_dfc") ||
-                        Pattern.matches(card_layout, "reversible_card")) {
+                } else if (Pattern.matches(card_layout.getLayout(), "transform") ||
+                        Pattern.matches(card_layout.getLayout(), "modal_dfc") ||
+                        Pattern.matches(card_layout.getLayout(), "reversible_card")) {
                     logger.info("Inside layout: " + card_layout);
 
                     ////////////////////////
@@ -600,7 +666,7 @@ public class Create {
                     // Create trigger mcfunction
                     createFile(datapackPATH + mcfunctionPATH, mcfunctionNAME, "mcfunction");
                     writeToFile(datapackPATH + mcfunctionPATH + mcfunctionNAME + ".mcfunction",
-                            "reload\nexecute as @p " +
+                            "execute as @p " +
                                     "if items entity @p weapon.mainhand minecraft:" +
                                     front.getMaterial() +
                                     " run item replace entity @p weapon.mainhand " +
@@ -678,11 +744,12 @@ public class Create {
                     // Create trigger mcfunction
                     createFile(datapackPATH + mcfunctionPATH, mcfunctionNAME, "mcfunction");
                     writeToFile(datapackPATH + mcfunctionPATH + mcfunctionNAME + ".mcfunction",
-                            "reload\nexecute as @p " +
-                                    "if items entity @p weapon.mainhand minecraft:" +
-                                    card.getMaterial() +
-                                    " run item replace entity @p weapon.mainhand " +
-                                    "with minecraft:" +
+                            // "execute as @p " +
+                            // "if items entity @p weapon.mainhand minecraft:" +
+                            // card.getMaterial() +
+                            // " run item replace entity @p weapon.mainhand " +
+                            // "with " +
+                            "minecraft:" +
                                     card.getMaterial() +
                                     "[minecraft:custom_name=\"" +
                                     card.getName() +
