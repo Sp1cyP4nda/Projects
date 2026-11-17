@@ -1,0 +1,23 @@
+
+
+1. Set Up Your Local Copy
+
+Before you can edit files, you need to copy the repository from GitHub to your machine.
+• Clone the repository. Run git clone <repository-url> in your terminal to download the files and project history. You can find this URL on your repository's main page on GitHub using either HTTPS or SSH.
+• Enter the project folder. Run cd <repository-name> to move your terminal session inside the newly created directory.
+• Verify your remote connection. Run git remote -v to confirm your local folder is linked to GitHub under the default name origin.
+
+2. Follow the Daily Workflow
+
+Once set up, follow this cycle whenever you work on your code.
+• Get the latest updates. Run git pull origin main (or your default branch name) before starting work. This downloads and merges any changes made on GitHub since you last worked.
+• Create a branch for new work. Run git checkout -b <feature-branch-name> to isolate your edits. Working on a separate branch keeps the main branch stable while you build or fix things.
+• Check your modified files. Run git status at any time to see which files you have edited, added, or deleted.
+• Stage your changes. Run git add . to prepare all modified files for saving, or git add <filename> for specific files.
+• Commit your snapshot. Run git commit -m "Describe your changes" to save a permanent checkpoint of your staged work in your local history.
+
+3. Send Changes Back to GitHub
+
+Local commits stay on your computer until you explicitly upload them.
+• Push your branch. Run git push -u origin <feature-branch-name> to upload your commits to GitHub. After the first push on a branch, you only need to run git push.
+• Open a Pull Request. Visit your repository on GitHub Docs or the main GitHub site to open a Pull Request (PR). Merging the PR integrates your feature branch into the main branch.

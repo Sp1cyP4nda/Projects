@@ -1,10 +1,11 @@
-#First things first
+# First things first
+# This must be run
 # From inside a live installer
 
 ##############################
 ###                        ###
 ### User-Defined Variables ###
-###			   ###
+###			                   ###
 ##############################
 
 # Display lsblk
@@ -26,12 +27,12 @@ read -rp "Repartition the drive? (y/N) " repartition
 fi
 
 ################################
-###			     ###
+###			                     ###
 ### System-Defined Variables ###
-###			     ###
+###			                     ###
 ################################
 
-# If this is a new luks device, 
+# Ask if this is a new luks device,
 ## disk has partition table:
 checkpt=(lsblk -dno pttype $device_block_name)
 "${checkpt[@]}" 2&>/dev/null && has_pttable=TRUE || has_pttable=FALSE
@@ -56,9 +57,9 @@ partition_main="$(echo $device_block_name)2"
 fi
 
 ##########################
-###		       ###
+###		                 ###
 ### Running the Script ###
-###		       ###
+###		                 ###
 ##########################
 
 # Prep the drive, if needed
@@ -112,8 +113,6 @@ mount -t proc none /mnt/proc
 mount -t sysfs none /mnt/sys
 mount --rbind /dev /mnt/dev
 mount --rbind /run /mnt/run
-#exit
-#chroot /mnt
 # Create the script that will run in the chroot
 cat > /mnt/run.sh << 'EOF'
 #!/bin/bash
@@ -152,9 +151,9 @@ touch /etc/dracut.conf.d/10-crypt.conf
 echo "install_items+=\" /boot/volume.key /etc/crypttab \"" > /etc/dracut.conf.d/10-crypt.conf
 
 #######################################
-###				    ###
+###				                          ###
 ### Post-Installation Configuration ###
-###				    ###
+###				                          ###
 #######################################
 
 # Setup a sudo account
@@ -171,21 +170,43 @@ echo "Enter a secure password:"
 until (passwd $(echo $std_acct));do echo "Try again";done
 userdel -r anon
 
-#########################
-###		      ###
-### GRUB Installation ###
-###                   ###
-#########################
+#######################
+###		              ###
+### Personalization ###
+###                 ###
+#######################
 
-#xbps-install -S grub-$(uname -m)-efi
-mount -t efivarfs none /sys/firmware/efi/efivars
-#grub-install --target=$(uname -m)-efi --efi-directory=/boot/efi --bootloader-id="Void"
+# Keyboard shortcuts
+# # [Super] + [L] - Lock device
+# # [Super] + [I] - All settings
+# # [Alt]   + [T] - Open terminal
+# # Remove orca shortcut
+# Power management
+# Screensaver
+# Dark mode
+# # Adwaita-dark
+# Touchpad
+# Windows snap to other windows
+# Terminal
+# # Hide menu bar
+# # Hide scroll bar
+# # Unlimited scrollback
+# # Text color to green
+# Offline app installation
+# # Obsidian + add to menu
+# # Cloud storage solution
+# Remove panel 2
+# Add power management plugin
+# Show notifications on primary monitor
+# Show cursor
+# # Accessibility -> Show location of pointer on keypress
+# # Then bind xfce4-find-cursor to [CTRL]
 
-###################################
-###			        ###
-### Post-Installation Hardening ###
-###				###
-###################################
+########################
+###                  ###
+### Device Hardening ###
+###				           ###
+########################
 
 # Block root access
 passwd -l root
@@ -193,16 +214,18 @@ usermod -s /usr/sbin/nologin root
 # Block interactive for shadow, gshadow, passwd, and group
 chattr +i /etc/shadow /etc/gshadow /etc/passwd /etc/group
 # Copy in preconFiles
+# Turn off automount
 # Lockdown GRUB (make bak first)
 # aa-configurations
 update-grub
 
 ####################################
-###				 ###
+###                     				 ###
 ### Complete System Installation ###
-###				 ###
+###				                       ###
 ####################################
 
+mount -t efivarfs none /sys/firmware/efi/efivars
 grub-install $(echo $device_block_name)
 xbps-reconfigure -fa
 exit
